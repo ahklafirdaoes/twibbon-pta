@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twibbon PTA 2026 — I'm Ready For</title>
+<style>
+  :root{
+    --void: #120b26;
+    --void-2: #1c1240;
+    --nebula: #7c5cff;
+    --nebula-2: #4fd6e0;
+    --star: #f4f1ff;
+    --star-dim: #b6acd9;
+    --panel: rgba(255,255,255,0.06);
+    --panel-border: rgba(255,255,255,0.14);
+    --success: #4fe0a0;
+    --danger: #ff6b6b;
+    --font-display: 'Baloo 2', 'Poppins', sans-serif;
+    --font-body: 'Poppins', sans-serif;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Poppins:wght@400;500;600&display=swap');
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(124,92,255,0.35), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(79,214,224,0.25), transparent 50%),
+      linear-gradient(180deg, var(--void) 0%, var(--void-2) 100%);
+    color:var(--star);
+    font-family:var(--font-body);
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* starfield */
+  .stars{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image:
+      radial-gradient(1.5px 1.5px at 20px 30px, white, transparent),
+      radial-gradient(1px 1px at 120px 80px, white, transparent),
+      radial-gradient(1.5px 1.5px at 220px 140px, white, transparent),
+      radial-gradient(1px 1px at 320px 40px, white, transparent),
+      radial-gradient(1.5px 1.5px at 60px 200px, white, transparent),
+      radial-gradient(1px 1px at 400px 260px, white, transparent);
+    background-repeat:repeat;
+    background-size:440px 300px;
+    opacity:0.5;
+    animation:drift 90s linear infinite;
+  }
+  @keyframes drift{ from{background-position:0 0;} to{background-position:-1000px 600px;} }
+
+  header{
+    position:relative; z-index:1;
+    text-align:center;
+    padding:44px 20px 18px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--nebula-2);
+    background:rgba(79,214,224,0.1);
+    border:1px solid rgba(79,214,224,0.35);
+    padding:6px 14px;
+    border-radius:999px;
+    margin-bottom:16px;
+  }
+  h1{
+    font-family:var(--font-display);
+    font-weight:800;
+    font-size:clamp(28px, 5vw, 46px);
+    margin:0 0 8px;
+    line-height:1.1;
+    background:linear-gradient(90deg,#a99bff,#8ff5ff);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  header p{
+    color:var(--star-dim);
+    font-size:15px;
+    max-width:460px;
+    margin:0 auto;
+  }
+
+  main{
+    position:relative; z-index:1;
+    max-width:960px;
+    margin:0 auto;
+    padding:20px 20px 80px;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:28px;
+  }
+  @media(min-width:820px){
+    main{ grid-template-columns: 1.1fr 0.9fr; align-items:start; }
+  }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:22px;
+    padding:22px;
+    backdrop-filter:blur(6px);
+  }
+
+  /* preview stage */
+  .stage-wrap{
+    display:flex; flex-direction:column; align-items:center; gap:16px;
+  }
+  .stage{
+    position:relative;
+    width:100%;
+    max-width:480px;
+    aspect-ratio:1/1;
+    border-radius:16px;
+    overflow:hidden;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)),
+      repeating-conic-gradient(#241a4a 0% 25%, #1a1236 0% 50%) 50% / 24px 24px;
+  }
+  .stage video, .stage img.user-media{
+    position:absolute;
+    left:26.1%; top:18.7%; width:47.7%; height:64.6%;
+    object-fit:cover;
+    z-index:1;
+  }
+  .stage img.frame-img{
+    position:absolute; inset:0; width:100%; height:100%; z-index:2; pointer-events:none;
+  }
+  .stage .placeholder{
+    position:absolute; inset:0; z-index:0;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center; padding:40px;
+    color:var(--star-dim);
+    font-size:13px;
+    line-height:1.5;
+  }
+
+  .upload-row{
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+  }
+  label.upload-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    background:linear-gradient(135deg, var(--nebula), #5b3fd6);
+    color:white;
+    font-weight:600;
+    font-size:14px;
+    padding:12px 20px;
+    border-radius:12px;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,0.15);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  label.upload-btn:hover{ transform:translateY(-1px); box-shadow:0 8px 20px rgba(124,92,255,0.35); }
+  label.upload-btn input{ display:none; }
+
+  .file-name{ font-size:12px; color:var(--star-dim); text-align:center; min-height:16px; }
+
+  /* side panel controls */
+  .panel h2{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:19px;
+    margin:0 0 4px;
+  }
+  .panel .sub{ color:var(--star-dim); font-size:13px; margin:0 0 18px; }
+
+  .zoom-row{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .zoom-row span{ font-size:12px; color:var(--star-dim); width:38px; }
+  input[type=range]{
+    flex:1; accent-color:var(--nebula-2);
+  }
+
+  .actions{ display:flex; flex-direction:column; gap:10px; margin-top:6px; }
+  button.primary, a.primary{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    background:linear-gradient(135deg, var(--nebula-2), #2fb8c4);
+    color:#0c1830;
+    font-weight:700;
+    font-size:15px;
+    padding:14px 18px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    text-decoration:none;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  button.primary:disabled{ opacity:0.4; cursor:not-allowed; }
+  button.primary:not(:disabled):hover, a.primary:hover{ transform:translateY(-1px); box-shadow:0 8px 20px rgba(79,214,224,0.3); }
+
+  button.secondary{
+    background:transparent;
+    border:1px solid var(--panel-border);
+    color:var(--star);
+    font-weight:600;
+    font-size:14px;
+    padding:12px 18px;
+    border-radius:12px;
+    cursor:pointer;
+  }
+  button.secondary:hover{ border-color:var(--nebula-2); }
+
+  .status{
+    font-size:13px;
+    text-align:center;
+    min-height:18px;
+    margin-top:4px;
+  }
+  .status.recording{ color:var(--danger); }
+  .status.ready{ color:var(--success); }
+
+  .divider{ height:1px; background:var(--panel-border); margin:18px 0; }
+
+  .tag-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+  .tag{
+    font-size:11px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid var(--panel-border);
+    color:var(--star-dim);
+    padding:5px 10px;
+    border-radius:999px;
+  }
+
+  footer{
+    text-align:center;
+    color:var(--star-dim);
+    font-size:12px;
+    padding:20px;
+    position:relative; z-index:1;
+  }
+
+  canvas{ display:none; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<header>
+  <span class="eyebrow">PTA 2026 · I'm Ready For</span>
+  <h1>Buat Twibbon-mu</h1>
+  <p>Upload foto atau video, geser & perbesar sampai pas, lalu unduh hasilnya lengkap dengan frame.</p>
+</header>
+
+<main>
+  <section class="panel stage-wrap">
+    <div class="stage" id="stage">
+      <div class="placeholder" id="placeholder">Belum ada foto/video.<br>Upload di sebelah kanan untuk mulai 🚀</div>
+      <video id="userVideo" muted playsinline loop style="display:none"></video>
+      <img id="userImage" class="user-media" style="display:none" alt="foto pengguna">
+      <img class="frame-img" src="frame.png" alt="frame PTA 2026">
+    </div>
+    <div class="file-name" id="fileName"></div>
+  </section>
+
+  <section class="panel">
+    <h2>1. Upload media</h2>
+    <p class="sub">Pilih foto (JPG/PNG) atau video (MP4/WebM, maks. beberapa menit).</p>
+    <div class="upload-row">
+      <label class="upload-btn">
+        📷 Pilih foto
+        <input type="file" id="photoInput" accept="image/*">
+      </label>
+      <label class="upload-btn">
+        🎬 Pilih video
+        <input type="file" id="videoInput" accept="video/*">
+      </label>
+    </div>
+
+    <div class="divider"></div>
+
+    <h2>2. Atur posisi</h2>
+    <p class="sub">Geser untuk memindahkan, gunakan slider untuk memperbesar.</p>
+    <div class="zoom-row">
+      <span>Zoom</span>
+      <input type="range" id="zoomRange" min="100" max="250" value="100">
+    </div>
+    <div class="tag-row">
+      <span class="tag">Seret media untuk geser posisi</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <h2>3. Unduh</h2>
+    <p class="sub">Foto langsung jadi PNG. Video direkam ulang dengan frame (butuh beberapa detik).</p>
+    <div class="actions">
+      <button class="primary" id="downloadPhotoBtn" disabled>⬇️ Unduh Foto (PNG)</button>
+      <button class="primary" id="downloadVideoBtn" disabled>⬇️ Rekam & Unduh Video</button>
+      <button class="secondary" id="resetBtn">Reset</button>
+    </div>
+    <div class="status" id="status"></div>
+  </section>
+</main>
+
+<footer>Frame: I'm Ready For — PTA 2026 · Dibuat dengan ❤️</footer>
+
+<canvas id="workCanvas" width="1080" height="1080"></canvas>
+
+<script>
+const stage = document.getElementById('stage');
+const placeholder = document.getElementById('placeholder');
+const photoInput = document.getElementById('photoInput');
+const videoInput = document.getElementById('videoInput');
+const userImage = document.getElementById('userImage');
+const userVideo = document.getElementById('userVideo');
+const zoomRange = document.getElementById('zoomRange');
+const fileNameEl = document.getElementById('fileName');
+const downloadPhotoBtn = document.getElementById('downloadPhotoBtn');
+const downloadVideoBtn = document.getElementById('downloadVideoBtn');
+const resetBtn = document.getElementById('resetBtn');
+const statusEl = document.getElementById('status');
+const workCanvas = document.getElementById('workCanvas');
+const ctx = workCanvas.getContext('2d');
+
+// Hole position within the 1080x1080 frame, as fractions (from detected bbox)
+const HOLE = { x: 282/1080, y: 202/1080, w: (797-282)/1080, h: (900-202)/1080 };
+
+const frameImg = new Image();
+frameImg.src = 'frame.png';
+
+let mode = null; // 'photo' | 'video'
+let offsetX = 0.5, offsetY = 0.5; // relative pan center (0..1)
+let zoom = 1;
+let dragging = false, lastX = 0, lastY = 0;
+
+function setStatus(msg, cls){
+  statusEl.textContent = msg || '';
+  statusEl.className = 'status' + (cls ? ' ' + cls : '');
+}
+
+function applyTransform(el){
+  const scale = zoom;
+  el.style.transform = `translate(-50%,-50%) scale(${scale}) translate(${(offsetX-0.5)*100}%, ${(offsetY-0.5)*100}%)`;
+  el.style.left = '50%';
+  el.style.top = '50%';
+  el.style.width = '47.7%';
+  el.style.height = '64.6%';
+  el.style.transformOrigin = 'center center';
+}
+
+function refreshVisual(){
+  if(mode === 'photo'){ applyTransform(userImage); }
+  if(mode === 'video'){ applyTransform(userVideo); }
+}
+
+zoomRange.addEventListener('input', () => {
+  zoom = zoomRange.value / 100;
+  refreshVisual();
+});
+
+// drag to pan
+function startDrag(e){
+  dragging = true;
+  const p = e.touches ? e.touches[0] : e;
+  lastX = p.clientX; lastY = p.clientY;
+}
+function moveDrag(e){
+  if(!dragging) return;
+  const p = e.touches ? e.touches[0] : e;
+  const dx = (p.clientX - lastX) / stage.clientWidth;
+  const dy = (p.clientY - lastY) / stage.clientHeight;
+  offsetX = Math.min(1, Math.max(0, offsetX - dx));
+  offsetY = Math.min(1, Math.max(0, offsetY - dy));
+  lastX = p.clientX; lastY = p.clientY;
+  refreshVisual();
+}
+function endDrag(){ dragging = false; }
+
+stage.addEventListener('mousedown', startDrag);
+window.addEventListener('mousemove', moveDrag);
+window.addEventListener('mouseup', endDrag);
+stage.addEventListener('touchstart', startDrag, {passive:true});
+window.addEventListener('touchmove', moveDrag, {passive:true});
+window.addEventListener('touchend', endDrag);
+
+photoInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const url = URL.createObjectURL(file);
+  userImage.src = url;
+  userImage.style.display = 'block';
+  userVideo.style.display = 'none';
+  userVideo.pause();
+  placeholder.style.display = 'none';
+  mode = 'photo';
+  offsetX = 0.5; offsetY = 0.5; zoom = 1; zoomRange.value = 100;
+  refreshVisual();
+  fileNameEl.textContent = file.name;
+  downloadPhotoBtn.disabled = false;
+  downloadVideoBtn.disabled = true;
+  setStatus('');
+});
+
+videoInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const url = URL.createObjectURL(file);
+  userVideo.src = url;
+  userVideo.style.display = 'block';
+  userImage.style.display = 'none';
+  placeholder.style.display = 'none';
+  mode = 'video';
+  offsetX = 0.5; offsetY = 0.5; zoom = 1; zoomRange.value = 100;
+  refreshVisual();
+  userVideo.play().catch(()=>{});
+  fileNameEl.textContent = file.name;
+  downloadVideoBtn.disabled = false;
+  downloadPhotoBtn.disabled = true;
+  setStatus('');
+});
+
+resetBtn.addEventListener('click', () => {
+  mode = null;
+  userImage.src = '';
+  userVideo.src = '';
+  userImage.style.display = 'none';
+  userVideo.style.display = 'none';
+  placeholder.style.display = 'flex';
+  fileNameEl.textContent = '';
+  downloadPhotoBtn.disabled = true;
+  downloadVideoBtn.disabled = true;
+  zoom = 1; zoomRange.value = 100; offsetX = 0.5; offsetY = 0.5;
+  setStatus('');
+});
+
+// draw the current user media (image or a given video frame) + frame into a 1080x1080 canvas
+function drawComposite(mediaEl, mediaWidth, mediaHeight){
+  ctx.clearRect(0,0,1080,1080);
+
+  const holeX = HOLE.x * 1080, holeY = HOLE.y * 1080, holeW = HOLE.w * 1080, holeH = HOLE.h * 1080;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(holeX, holeY, holeW, holeH);
+  ctx.clip();
+
+  // cover-fit media into hole, honoring zoom + pan offset
+  const holeAspect = holeW / holeH;
+  const mediaAspect = mediaWidth / mediaHeight;
+  let drawW, drawH;
+  if(mediaAspect > holeAspect){
+    drawH = holeH * zoom;
+    drawW = drawH * mediaAspect;
+  } else {
+    drawW = holeW * zoom;
+    drawH = drawW / mediaAspect;
+  }
+  const maxOffsetX = (drawW - holeW) * offsetX;
+  const maxOffsetY = (drawH - holeH) * offsetY;
+  const drawX = holeX - maxOffsetX;
+  const drawY = holeY - maxOffsetY;
+
+  ctx.drawImage(mediaEl, drawX, drawY, drawW, drawH);
+  ctx.restore();
+
+  ctx.drawImage(frameImg, 0, 0, 1080, 1080);
+}
+
+downloadPhotoBtn.addEventListener('click', () => {
+  if(mode !== 'photo') return;
+  drawComposite(userImage, userImage.naturalWidth, userImage.naturalHeight);
+  const link = document.createElement('a');
+  link.download = 'twibbon-pta2026.png';
+  link.href = workCanvas.toDataURL('image/png');
+  link.click();
+  setStatus('Foto berhasil diunduh ✅', 'ready');
+});
+
+downloadVideoBtn.addEventListener('click', async () => {
+  if(mode !== 'video') return;
+  downloadVideoBtn.disabled = true;
+  setStatus('Merekam video, mohon tunggu...', 'recording');
+
+  userVideo.currentTime = 0;
+  await userVideo.play();
+
+  const stream = workCanvas.captureStream(30);
+  let recorder;
+  try{
+    recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+  } catch(e){
+    recorder = new MediaRecorder(stream);
+  }
+  const chunks = [];
+  recorder.ondataavailable = (e) => { if(e.data.size > 0) chunks.push(e.data); };
+
+  recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: 'video/webm' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = 'twibbon-pta2026.webm';
+    link.href = url;
+    link.click();
+    setStatus('Video berhasil diunduh ✅', 'ready');
+    downloadVideoBtn.disabled = false;
+    userVideo.pause();
+  };
+
+  let raf;
+  function tick(){
+    drawComposite(userVideo, userVideo.videoWidth, userVideo.videoHeight);
+    if(!userVideo.paused && !userVideo.ended){
+      raf = requestAnimationFrame(tick);
+    }
+  }
+
+  recorder.start();
+  tick();
+
+  userVideo.onended = () => {
+    cancelAnimationFrame(raf);
+    recorder.stop();
+  };
+
+  // safety cap: stop after 30s even if video loops
+  setTimeout(() => {
+    if(recorder.state === 'recording'){
+      cancelAnimationFrame(raf);
+      recorder.stop();
+    }
+  }, 30000);
+});
+</script>
+</body>
+</html>
