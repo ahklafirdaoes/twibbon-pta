@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PTA 2026 — I'm Ready For</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --ink-950:#06070d;
+    --ink-900:#0b0e1a;
+    --ink-800:#111629;
+    --ink-700:#1a2038;
+    --line:rgba(255,255,255,0.09);
+    --line-strong:rgba(255,255,255,0.16);
+    --text-primary:#f2f3fa;
+    --text-secondary:#9198b5;
+    --text-muted:#5c6280;
+    --violet:#7c6cff;
+    --violet-dim:#4b3fb0;
+    --cyan:#4fd8d0;
+    --amber:#e0a94f;
+    --danger:#ef6f6f;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+    --radius:14px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:var(--ink-950);
+    color:var(--text-primary);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+  }
+
+  .field{ position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+  .field::before{
+    content:'';
+    position:absolute; inset:-10%;
+    background-image:
+      radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 38% 62%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(1.5px 1.5px at 64% 24%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 82% 70%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 92% 15%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1.5px 1.5px at 20% 85%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(1px 1px at 50% 92%, rgba(255,255,255,0.3), transparent);
+    background-repeat:repeat;
+    background-size:900px 700px;
+    opacity:0.6;
+  }
+  .field::after{
+    content:'';
+    position:absolute; top:-30%; left:50%; width:1400px; height:1400px;
+    transform:translateX(-50%);
+    background:radial-gradient(circle, rgba(124,108,255,0.14), transparent 60%);
+  }
+
+  a{ color:inherit; }
+
+  .topbar{
+    position:relative; z-index:1;
+    display:flex; align-items:center; justify-content:space-between;
+    max-width:1120px; margin:0 auto;
+    padding:28px 24px 0;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--text-secondary);
+  }
+  .brand .dot{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--cyan);
+    box-shadow:0 0 8px var(--cyan);
+  }
+  .badge-year{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--text-secondary);
+    border:1px solid var(--line-strong);
+    border-radius:999px;
+    padding:6px 14px;
+  }
+
+  header{
+    position:relative; z-index:1;
+    max-width:1120px; margin:0 auto;
+    padding:56px 24px 8px;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--violet);
+    margin-bottom:18px;
+  }
+  .eyebrow::before{ content:''; width:18px; height:1px; background:var(--violet); }
+  h1{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(32px, 4.4vw, 52px);
+    line-height:1.08;
+    letter-spacing:-0.01em;
+    margin:0 0 16px;
+    max-width:640px;
+  }
+  header p.lead{
+    color:var(--text-secondary);
+    font-size:16px;
+    line-height:1.6;
+    max-width:480px;
+    margin:0;
+  }
+
+  main{
+    position:relative; z-index:1;
+    max-width:1120px;
+    margin:0 auto;
+    padding:44px 24px 100px;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:20px;
+  }
+  @media(min-width:900px){
+    main{ grid-template-columns: 1fr 400px; align-items:start; }
+  }
+
+  .panel{
+    background:linear-gradient(180deg, var(--ink-900), var(--ink-800));
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:24px;
+  }
+
+  .role-panel{ }
+  .role-head{ display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
+  .role-options{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:16px;
+  }
+  .role-option{
+    display:flex; flex-direction:column; align-items:flex-start; gap:4px;
+    background:var(--ink-700);
+    border:1px solid var(--line-strong);
+    color:var(--text-primary);
+    text-align:left;
+    padding:16px 18px;
+    border-radius:12px;
+    cursor:pointer;
+    font-family:var(--font-body);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .role-option:hover{ border-color:var(--violet); }
+  .role-option.active{
+    border-color:var(--violet);
+    background:linear-gradient(180deg, rgba(124,108,255,0.14), rgba(124,108,255,0.04));
+  }
+  .role-option-label{ font-family:var(--font-display); font-weight:600; font-size:16px; }
+  .role-option-label::before{
+    content:'';
+    display:inline-block;
+    width:7px; height:7px;
+    border-radius:50%;
+    margin-right:9px;
+    background:var(--text-muted);
+    box-shadow:none;
+    transition:background .15s ease, box-shadow .15s ease;
+  }
+  .role-option.active .role-option-label::before{
+    background:var(--cyan);
+    box-shadow:0 0 6px var(--cyan);
+  }
+  .role-option-desc{ color:var(--text-secondary); font-size:12px; line-height:1.5; }
+
+  .upload-btn.disabled{
+    opacity:0.4;
+    cursor:not-allowed;
+    pointer-events:none;
+  }
+
+  .stage-panel{ display:flex; flex-direction:column; align-items:center; gap:20px; }
+  .stage-frame{ position:relative; width:100%; max-width:460px; }
+  .stage{
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    border-radius:6px;
+    overflow:hidden;
+    background:repeating-linear-gradient(45deg, var(--ink-700) 0 2px, var(--ink-800) 2px 14px);
+  }
+  .stage canvas#previewCanvas{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    display:block;
+    cursor:grab;
+    touch-action:none;
+  }
+  .stage canvas#previewCanvas.grabbing{ cursor:grabbing; }
+  .stage canvas#previewCanvas.no-media{ cursor:default; }
+  .stage .placeholder{
+    position:absolute; inset:0; z-index:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+    text-align:center; padding:40px;
+    color:var(--text-muted);
+    pointer-events:none;
+  }
+  .stage .placeholder svg{ opacity:0.5; }
+  .stage .placeholder span{ font-size:13px; line-height:1.6; max-width:220px; }
+
+  .reticle{ position:absolute; inset:-1px; z-index:3; pointer-events:none; }
+  .reticle i{ position:absolute; width:22px; height:22px; border-color:var(--violet); opacity:0.85; font-style:normal; }
+  .reticle i.tl{ top:-1px; left:-1px; border-top:2px solid; border-left:2px solid; border-top-left-radius:6px; }
+  .reticle i.tr{ top:-1px; right:-1px; border-top:2px solid; border-right:2px solid; border-top-right-radius:6px; }
+  .reticle i.bl{ bottom:-1px; left:-1px; border-bottom:2px solid; border-left:2px solid; border-bottom-left-radius:6px; }
+  .reticle i.br{ bottom:-1px; right:-1px; border-bottom:2px solid; border-right:2px solid; border-bottom-right-radius:6px; }
+
+  .coord-row{
+    display:flex; justify-content:space-between; align-items:center;
+    width:100%; max-width:460px;
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-muted);
+    letter-spacing:.02em;
+  }
+  .coord-row .file-name{ color:var(--text-secondary); }
+
+  .steps{ display:flex; flex-direction:column; gap:0; }
+  .step{ padding:22px 0; border-top:1px solid var(--line); }
+  .step:first-child{ border-top:none; padding-top:2px; }
+  .step-head{ display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
+  .step-num{ font-family:var(--font-mono); font-size:11px; color:var(--violet); letter-spacing:.05em; }
+  .step-title{ font-family:var(--font-display); font-weight:600; font-size:16px; }
+  .step-desc{ color:var(--text-secondary); font-size:13px; line-height:1.6; margin:0 0 16px; }
+
+  .upload-row{ display:flex; gap:10px; }
+  label.upload-btn{
+    flex:1;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    background:var(--ink-700);
+    border:1px solid var(--line-strong);
+    color:var(--text-primary);
+    font-size:13px;
+    font-weight:500;
+    padding:12px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  label.upload-btn:hover{ border-color:var(--violet); background:var(--ink-800); }
+  label.upload-btn input{ display:none; }
+  label.upload-btn svg{ flex-shrink:0; }
+
+  .zoom-row{ display:flex; align-items:center; gap:12px; }
+  .zoom-row .zoom-label{ font-family:var(--font-mono); font-size:11px; color:var(--text-muted); width:34px; }
+  input[type=range]{
+    flex:1;
+    -webkit-appearance:none;
+    appearance:none;
+    height:2px;
+    background:var(--line-strong);
+    border-radius:2px;
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:14px; height:14px;
+    border-radius:50%;
+    background:var(--violet);
+    cursor:pointer;
+    border:2px solid var(--ink-950);
+    box-shadow:0 0 0 1px var(--violet);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px; height:14px;
+    border-radius:50%;
+    background:var(--violet);
+    cursor:pointer;
+    border:2px solid var(--ink-950);
+  }
+  .zoom-value{ font-family:var(--font-mono); font-size:11px; color:var(--text-secondary); width:36px; text-align:right; }
+  .hint{ font-family:var(--font-mono); font-size:11px; color:var(--text-muted); margin-top:12px; }
+
+  .actions{ display:flex; flex-direction:column; gap:8px; }
+  button.primary{
+    display:flex; align-items:center; justify-content:center; gap:9px;
+    background:var(--violet);
+    color:#0a0714;
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:14px;
+    padding:13px 18px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    transition:background .15s ease, transform .1s ease;
+  }
+  button.primary:disabled{ background:var(--ink-700); color:var(--text-muted); cursor:not-allowed; }
+  button.primary:not(:disabled):hover{ background:#8f80ff; }
+  button.primary:not(:disabled):active{ transform:scale(0.99); }
+
+  button.ghost{
+    background:transparent;
+    border:1px solid var(--line-strong);
+    color:var(--text-secondary);
+    font-family:var(--font-body);
+    font-weight:500;
+    font-size:13px;
+    padding:11px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  button.ghost:hover{ border-color:var(--text-secondary); color:var(--text-primary); }
+
+  .status-row{
+    display:flex; align-items:center; gap:8px;
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-muted);
+    min-height:16px;
+    margin-top:14px;
+  }
+  .status-row .dot{ width:6px; height:6px; border-radius:50%; background:var(--text-muted); flex-shrink:0; }
+  .status-row.recording .dot{ background:var(--danger); box-shadow:0 0 6px var(--danger); animation:pulse 1.2s ease-in-out infinite; }
+  .status-row.recording{ color:var(--danger); }
+  .status-row.ready .dot{ background:var(--cyan); box-shadow:0 0 6px var(--cyan); }
+  .status-row.ready{ color:var(--cyan); }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  footer{
+    position:relative; z-index:1;
+    max-width:1120px; margin:0 auto;
+    padding:20px 24px 40px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-muted);
+    border-top:1px solid var(--line);
+  }
+
+  .progress-track{
+    width:100%;
+    height:3px;
+    background:var(--ink-700);
+    border-radius:2px;
+    overflow:hidden;
+    margin-top:4px;
+  }
+  .progress-fill{
+    height:100%;
+    width:0%;
+    background:var(--violet);
+    transition:width .2s ease;
+  }
+
+  canvas{ display:none; }
+  canvas#previewCanvas{ display:block; }
+
+  @media(max-width:480px){
+    footer{ flex-direction:column; gap:6px; text-align:center; }
+  }
+</style>
+</head>
+<body>
+<div class="field" aria-hidden="true"></div>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span>PTA 2026 / IM READY FOR</div>
+  <div class="badge-year" id="roleBadge">Pilih peran</div>
+</div>
+
+<header>
+  <div class="eyebrow">Twibbon generator</div>
+  <h1>Siapkan foto atau video partisipasimu</h1>
+  <p class="lead">Pilih peran, unggah foto atau video, atur posisinya di dalam bingkai, lalu unduh hasil akhir dalam resolusi penuh — semuanya diproses langsung di perangkatmu.</p>
+</header>
+
+<main>
+  <section class="panel role-panel" style="grid-column:1/-1">
+    <div class="role-head">
+      <span class="step-num">00</span>
+      <span class="step-title">Pilih peran</span>
+    </div>
+    <p class="step-desc" style="margin-bottom:0">Tentukan kategori twibbon sebelum mengunggah media. Bisa diganti kapan saja.</p>
+    <div class="role-options">
+      <button type="button" class="role-option" id="roleOptionPeserta" data-role="peserta">
+        <span class="role-option-label">Peserta</span>
+        <span class="role-option-desc">Bingkai untuk peserta kegiatan</span>
+      </button>
+      <button type="button" class="role-option" id="roleOptionPanitia" data-role="panitia">
+        <span class="role-option-label">Panitia</span>
+        <span class="role-option-desc">Bingkai untuk panitia kegiatan</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="panel stage-panel">
+    <div class="stage-frame">
+      <div class="stage" id="stage">
+        <div class="placeholder" id="placeholder">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5.2-5.2a2 2 0 0 0-2.8 0L5 19"/></svg>
+          <span id="placeholderText">Pilih peran terlebih dahulu di atas.</span>
+        </div>
+        <canvas id="previewCanvas" width="1000" height="1000"></canvas>
+        <div class="reticle"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+      </div>
+    </div>
+    <div class="coord-row">
+      <span>3375 × 3375</span>
+      <span class="file-name" id="fileName">tidak ada file</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-head">
+          <span class="step-num">01</span>
+          <span class="step-title">Unggah media</span>
+        </div>
+        <p class="step-desc">Foto (JPG, PNG) atau video (MP4, WebM).</p>
+        <div class="upload-row">
+          <label class="upload-btn disabled" id="photoUploadLabel">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5.2-5.2a2 2 0 0 0-2.8 0L5 19"/></svg>
+            Foto
+            <input type="file" id="photoInput" accept="image/*" disabled>
+          </label>
+          <label class="upload-btn disabled" id="videoUploadLabel">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="6" width="14" height="12" rx="2"/><path d="M16.5 10l5-3v10l-5-3z"/></svg>
+            Video
+            <input type="file" id="videoInput" accept="video/*" disabled>
+          </label>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head">
+          <span class="step-num">02</span>
+          <span class="step-title">Atur posisi</span>
+        </div>
+        <p class="step-desc">Klik dan seret media pada bingkai pratinjau untuk memindahkannya — bingkai selalu diam di tempat. Gunakan penggeser untuk memperbesar.</p>
+        <div class="zoom-row">
+          <span class="zoom-label">ZOOM</span>
+          <input type="range" id="zoomRange" min="100" max="250" value="100">
+          <span class="zoom-value" id="zoomValue">100%</span>
+        </div>
+        <p class="hint">Pratinjau ini sama persis dengan hasil unduhan</p>
+      </div>
+
+      <div class="step">
+        <div class="step-head">
+          <span class="step-num">03</span>
+          <span class="step-title">Unduh hasil</span>
+        </div>
+        <p class="step-desc">Foto diproses instan. Video direkam lengkap dengan bingkai lalu dikonversi menjadi file MP4 asli — proses pertama kali butuh waktu lebih lama untuk memuat konverter.</p>
+        <div class="actions">
+          <button class="primary" id="downloadPhotoBtn" disabled>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
+            Unduh foto
+          </button>
+          <button class="primary" id="downloadVideoBtn" disabled>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
+            Rekam dan unduh video (MP4)
+          </button>
+          <div class="progress-track" id="progressTrack" style="display:none">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <button class="ghost" id="resetBtn">Reset</button>
+        </div>
+        <div class="status-row" id="statusRow"><span class="dot"></span><span id="statusText">Menunggu media</span></div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>Diproses lokal di peramban — tidak ada data yang diunggah ke server</span>
+  <span>I'm Ready For — PTA 2026</span>
+</footer>
+
+<video id="userVideo" muted playsinline loop style="position:fixed; left:-9999px; top:-9999px; width:1px; height:1px; opacity:0;"></video>
+<img id="userImage" style="position:fixed; left:-9999px; top:-9999px; width:1px; height:1px; opacity:0;" alt="">
+
+<canvas id="workCanvas" width="3375" height="3375"></canvas>
+
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+<script>
+const stage = document.getElementById('stage');
+const placeholder = document.getElementById('placeholder');
+const photoInput = document.getElementById('photoInput');
+const videoInput = document.getElementById('videoInput');
+const userImage = document.getElementById('userImage');
+const userVideo = document.getElementById('userVideo');
+const zoomRange = document.getElementById('zoomRange');
+const zoomValue = document.getElementById('zoomValue');
+const fileNameEl = document.getElementById('fileName');
+const downloadPhotoBtn = document.getElementById('downloadPhotoBtn');
+const downloadVideoBtn = document.getElementById('downloadVideoBtn');
+const resetBtn = document.getElementById('resetBtn');
+const statusRow = document.getElementById('statusRow');
+const statusText = document.getElementById('statusText');
+const progressTrack = document.getElementById('progressTrack');
+const progressFill = document.getElementById('progressFill');
+const previewCanvas = document.getElementById('previewCanvas');
+const previewCtx = previewCanvas.getContext('2d');
+const workCanvas = document.getElementById('workCanvas');
+const ctx = workCanvas.getContext('2d');
+const roleBadge = document.getElementById('roleBadge');
+const roleOptionPeserta = document.getElementById('roleOptionPeserta');
+const roleOptionPanitia = document.getElementById('roleOptionPanitia');
+const photoUploadLabel = document.getElementById('photoUploadLabel');
+const videoUploadLabel = document.getElementById('videoUploadLabel');
+const placeholderText = document.getElementById('placeholderText');
+
+let ffmpegInstance = null;
+async function getFfmpeg(){
+  if(ffmpegInstance) return ffmpegInstance;
+  const { createFFmpeg } = FFmpeg;
+  ffmpegInstance = createFFmpeg({
+    log: false,
+    corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
+  });
+  await ffmpegInstance.load();
+  return ffmpegInstance;
+}
+
+const FRAMES = {
+  peserta: {
+    label: 'Peserta',
+    src: 'frame-peserta.png',
+    hole: { x: 880/3375, y: 624/3375, w: (2495-880)/3375, h: (2818-624)/3375 },
+    img: new Image(),
+    ready: false
+  },
+  panitia: {
+    label: 'Panitia',
+    src: 'frame-panitia.png',
+    hole: { x: 880/3375, y: 624/3375, w: (2495-880)/3375, h: (2872-624)/3375 },
+    img: new Image(),
+    ready: false
+  }
+};
+Object.keys(FRAMES).forEach((key) => {
+  const f = FRAMES[key];
+  f.img.onload = () => { f.ready = true; if(role === key) renderPreview(); };
+  f.img.src = f.src;
+});
+
+let role = null;
+function activeFrame(){ return role ? FRAMES[role] : null; }
+
+function selectRole(key){
+  role = key;
+  roleOptionPeserta.classList.toggle('active', key === 'peserta');
+  roleOptionPanitia.classList.toggle('active', key === 'panitia');
+  roleBadge.textContent = FRAMES[key].label.toUpperCase();
+
+  photoInput.disabled = false;
+  videoInput.disabled = false;
+  photoUploadLabel.classList.remove('disabled');
+  videoUploadLabel.classList.remove('disabled');
+
+  updatePlaceholderText();
+  renderPreview();
+}
+
+roleOptionPeserta.addEventListener('click', () => selectRole('peserta'));
+roleOptionPanitia.addEventListener('click', () => selectRole('panitia'));
+
+function updatePlaceholderText(){
+  if(!role){
+    placeholderText.textContent = 'Pilih peran terlebih dahulu di atas.';
+  } else {
+    placeholderText.textContent = 'Belum ada media. Pilih foto atau video pada panel di samping.';
+  }
+}
+
+let mode = null;
+let offsetX = 0.5, offsetY = 0.5; // 0..1, fraction of pannable range
+let zoom = 1;
+let dragging = false, lastX = 0, lastY = 0;
+let previewRafId = null;
+
+function setStatus(msg, cls){
+  statusText.textContent = msg;
+  statusRow.className = 'status-row' + (cls ? ' ' + cls : '');
+}
+
+// Core geometry: given a target canvas size, the media's natural size and current zoom,
+// compute the hole rect and the draw rect for the media (cover-fit + zoom + pan).
+// This exact function backs BOTH the live preview and the final export, so what you see
+// while dragging is guaranteed to match the downloaded result.
+function computeLayout(CW, CH, mediaW, mediaH){
+  const f = activeFrame();
+  if(!f) return { holeX:0, holeY:0, holeW:0, holeH:0, drawW:0, drawH:0, drawX:0, drawY:0, rangeX:0, rangeY:0 };
+  const HOLE = f.hole;
+  const holeX = HOLE.x * CW, holeY = HOLE.y * CH, holeW = HOLE.w * CW, holeH = HOLE.h * CH;
+  const holeAspect = holeW / holeH;
+  const mediaAspect = mediaW / mediaH;
+  let drawW, drawH;
+  if(mediaAspect > holeAspect){
+    drawH = holeH * zoom;
+    drawW = drawH * mediaAspect;
+  } else {
+    drawW = holeW * zoom;
+    drawH = drawW / mediaAspect;
+  }
+  const rangeX = Math.max(0, drawW - holeW);
+  const rangeY = Math.max(0, drawH - holeH);
+  const drawX = holeX - rangeX * offsetX;
+  const drawY = holeY - rangeY * offsetY;
+  return { holeX, holeY, holeW, holeH, drawW, drawH, drawX, drawY, rangeX, rangeY };
+}
+
+function drawCompositeOn(targetCtx, targetCanvas, mediaEl, mediaW, mediaH){
+  const CW = targetCanvas.width, CH = targetCanvas.height;
+  targetCtx.clearRect(0, 0, CW, CH);
+
+  const f = activeFrame();
+
+  if(mediaEl && mediaW && mediaH && f){
+    const L = computeLayout(CW, CH, mediaW, mediaH);
+    targetCtx.save();
+    targetCtx.beginPath();
+    targetCtx.rect(L.holeX, L.holeY, L.holeW, L.holeH);
+    targetCtx.clip();
+    targetCtx.drawImage(mediaEl, L.drawX, L.drawY, L.drawW, L.drawH);
+    targetCtx.restore();
+  }
+
+  if(f && f.ready){
+    targetCtx.drawImage(f.img, 0, 0, CW, CH);
+  }
+}
+
+function currentMedia(){
+  if(mode === 'photo') return { el: userImage, w: userImage.naturalWidth, h: userImage.naturalHeight };
+  if(mode === 'video') return { el: userVideo, w: userVideo.videoWidth, h: userVideo.videoHeight };
+  return null;
+}
+
+function renderPreview(){
+  const m = currentMedia();
+  drawCompositeOn(previewCtx, previewCanvas, m ? m.el : null, m ? m.w : 0, m ? m.h : 0);
+}
+
+function startPreviewLoop(){
+  stopPreviewLoop();
+  function loop(){
+    renderPreview();
+    if(mode === 'video' && !userVideo.paused && !userVideo.ended){
+      previewRafId = requestAnimationFrame(loop);
+    }
+  }
+  loop();
+}
+function stopPreviewLoop(){
+  if(previewRafId){ cancelAnimationFrame(previewRafId); previewRafId = null; }
+}
+
+zoomRange.addEventListener('input', () => {
+  zoom = zoomRange.value / 100;
+  zoomValue.textContent = zoomRange.value + '%';
+  renderPreview();
+});
+
+// Drag to pan — operates in canvas pixel space so it matches the export exactly,
+// regardless of how the canvas is scaled down for display.
+function canvasPoint(e){
+  const rect = previewCanvas.getBoundingClientRect();
+  const p = e.touches ? e.touches[0] : e;
+  const scaleX = previewCanvas.width / rect.width;
+  const scaleY = previewCanvas.height / rect.height;
+  return { x: (p.clientX - rect.left) * scaleX, y: (p.clientY - rect.top) * scaleY };
+}
+
+function startDrag(e){
+  if(!mode) return;
+  dragging = true;
+  previewCanvas.classList.add('grabbing');
+  const pt = canvasPoint(e);
+  lastX = pt.x; lastY = pt.y;
+}
+function moveDrag(e){
+  if(!dragging || !mode) return;
+  const m = currentMedia();
+  if(!m || !m.w || !m.h) return;
+  const L = computeLayout(previewCanvas.width, previewCanvas.height, m.w, m.h);
+  const pt = canvasPoint(e);
+  const dx = pt.x - lastX;
+  const dy = pt.y - lastY;
+  if(L.rangeX > 0) offsetX = Math.min(1, Math.max(0, offsetX - dx / L.rangeX));
+  if(L.rangeY > 0) offsetY = Math.min(1, Math.max(0, offsetY - dy / L.rangeY));
+  lastX = pt.x; lastY = pt.y;
+  renderPreview();
+}
+function endDrag(){
+  dragging = false;
+  previewCanvas.classList.remove('grabbing');
+}
+
+previewCanvas.addEventListener('mousedown', startDrag);
+window.addEventListener('mousemove', moveDrag);
+window.addEventListener('mouseup', endDrag);
+previewCanvas.addEventListener('touchstart', startDrag, {passive:true});
+window.addEventListener('touchmove', moveDrag, {passive:true});
+window.addEventListener('touchend', endDrag);
+
+let lastPhotoUrl = null;
+let lastVideoUrl = null;
+
+photoInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if(!file || !role) return;
+
+  downloadPhotoBtn.disabled = true;
+  downloadVideoBtn.disabled = true;
+  userVideo.pause();
+  stopPreviewLoop();
+  setStatus('Memuat foto');
+
+  const url = URL.createObjectURL(file);
+  userImage.src = url;
+
+  try{
+    await userImage.decode();
+  } catch(err){
+    setStatus('Gagal memuat foto, coba file lain', 'recording');
+    URL.revokeObjectURL(url);
+    return;
+  }
+
+  if(lastPhotoUrl) URL.revokeObjectURL(lastPhotoUrl);
+  lastPhotoUrl = url;
+
+  mode = 'photo';
+  offsetX = 0.5; offsetY = 0.5; zoom = 1; zoomRange.value = 100; zoomValue.textContent = '100%';
+  previewCanvas.classList.remove('no-media');
+  placeholder.style.display = 'none';
+  renderPreview();
+  fileNameEl.textContent = file.name;
+  downloadPhotoBtn.disabled = false;
+  setStatus('Foto siap diunduh');
+});
+
+videoInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file || !role) return;
+
+  downloadPhotoBtn.disabled = true;
+  downloadVideoBtn.disabled = true;
+  stopPreviewLoop();
+  setStatus('Memuat video');
+
+  const url = URL.createObjectURL(file);
+  userVideo.src = url;
+  userVideo.onloadeddata = () => {
+    if(lastVideoUrl) URL.revokeObjectURL(lastVideoUrl);
+    lastVideoUrl = url;
+
+    mode = 'video';
+    offsetX = 0.5; offsetY = 0.5; zoom = 1; zoomRange.value = 100; zoomValue.textContent = '100%';
+    previewCanvas.classList.remove('no-media');
+    placeholder.style.display = 'none';
+    userVideo.play().catch(()=>{});
+    startPreviewLoop();
+    downloadVideoBtn.disabled = false;
+    setStatus('Video siap direkam');
+  };
+  userVideo.onerror = () => {
+    setStatus('Gagal memuat video, coba file lain', 'recording');
+  };
+  fileNameEl.textContent = file.name;
+});
+
+resetBtn.addEventListener('click', () => {
+  mode = null;
+  stopPreviewLoop();
+  userImage.src = '';
+  userVideo.pause();
+  userVideo.src = '';
+  placeholder.style.display = 'flex';
+  updatePlaceholderText();
+  previewCanvas.classList.add('no-media');
+  fileNameEl.textContent = 'tidak ada file';
+  downloadPhotoBtn.disabled = true;
+  downloadVideoBtn.disabled = true;
+  zoom = 1; zoomRange.value = 100; zoomValue.textContent = '100%'; offsetX = 0.5; offsetY = 0.5;
+  renderPreview();
+  setStatus('Menunggu media');
+});
+
+downloadPhotoBtn.addEventListener('click', async () => {
+  if(mode !== 'photo' || !role) return;
+  try{ await userImage.decode(); } catch(err){}
+  drawCompositeOn(ctx, workCanvas, userImage, userImage.naturalWidth, userImage.naturalHeight);
+  const link = document.createElement('a');
+  link.download = `twibbon-pta2026-${role}.png`;
+  link.href = workCanvas.toDataURL('image/png');
+  link.click();
+  setStatus('Foto berhasil diunduh', 'ready');
+});
+
+
+function recordComposite(){
+  return new Promise(async (resolve, reject) => {
+    stopPreviewLoop();
+    userVideo.currentTime = 0;
+    try{ await userVideo.play(); } catch(e){ reject(e); return; }
+
+    const stream = workCanvas.captureStream(30);
+    let recorder;
+    try{
+      recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+    } catch(e){
+      try{
+        recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      } catch(e2){
+        reject(e2); return;
+      }
+    }
+    const chunks = [];
+    recorder.ondataavailable = (e) => { if(e.data.size > 0) chunks.push(e.data); };
+
+    recorder.onstop = () => {
+      userVideo.pause();
+      startPreviewLoop();
+      resolve(new Blob(chunks, { type: 'video/webm' }));
+    };
+    recorder.onerror = (e) => reject(e.error || new Error('Perekaman gagal'));
+
+    let raf;
+    function tick(){
+      drawCompositeOn(ctx, workCanvas, userVideo, userVideo.videoWidth, userVideo.videoHeight);
+      if(!userVideo.paused && !userVideo.ended){
+        raf = requestAnimationFrame(tick);
+      }
+    }
+
+    recorder.start();
+    tick();
+
+    userVideo.onended = () => {
+      cancelAnimationFrame(raf);
+      if(recorder.state === 'recording') recorder.stop();
+    };
+
+    setTimeout(() => {
+      cancelAnimationFrame(raf);
+      if(recorder.state === 'recording') recorder.stop();
+    }, 30000);
+  });
+}
+
+async function transcodeToMp4(webmBlob){
+  const ffmpeg = await getFfmpeg();
+  const { fetchFile } = FFmpeg;
+
+  ffmpeg.setProgress(({ ratio }) => {
+    const pct = Math.max(0, Math.min(100, Math.round((ratio || 0) * 100)));
+    progressFill.style.width = pct + '%';
+  });
+
+  ffmpeg.FS('writeFile', 'input.webm', await fetchFile(webmBlob));
+  await ffmpeg.run(
+    '-i', 'input.webm',
+    '-c:v', 'libx264',
+    '-preset', 'veryfast',
+    '-crf', '23',
+    '-pix_fmt', 'yuv420p',
+    '-movflags', '+faststart',
+    'output.mp4'
+  );
+  const data = ffmpeg.FS('readFile', 'output.mp4');
+  ffmpeg.FS('unlink', 'input.webm');
+  ffmpeg.FS('unlink', 'output.mp4');
+  return new Blob([data.buffer], { type: 'video/mp4' });
+}
+
+downloadVideoBtn.addEventListener('click', async () => {
+  if(mode !== 'video' || !role) return;
+  downloadVideoBtn.disabled = true;
+  progressTrack.style.display = 'block';
+  progressFill.style.width = '0%';
+
+  try{
+    setStatus('Merekam video', 'recording');
+    const webmBlob = await recordComposite();
+
+    setStatus('Mengonversi ke MP4', 'recording');
+    const mp4Blob = await transcodeToMp4(webmBlob);
+
+    const url = URL.createObjectURL(mp4Blob);
+    const link = document.createElement('a');
+    link.download = `twibbon-pta2026-${role}.mp4`;
+    link.href = url;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+
+    setStatus('Video MP4 berhasil diunduh', 'ready');
+  } catch(err){
+    console.error(err);
+    setStatus('Konversi gagal, coba lagi', 'recording');
+  } finally{
+    progressTrack.style.display = 'none';
+    downloadVideoBtn.disabled = false;
+  }
+});
+
+previewCanvas.classList.add('no-media');
+renderPreview();
+
+</script>
+</body>
+</html>
